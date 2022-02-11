@@ -31,7 +31,7 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=activity)
     print("Bot is ready!")
 
-@commands.cooldown(1, 10, commands.BucketType.default)
+@commands.cooldown(1, 5, commands.BucketType.user)
 @bot.command(
     help="""
     Verfügbare Farben:
@@ -103,5 +103,10 @@ async def light_fancy(ctx, r, g, b):
     post(url, headers=headers, data=getData(r, g, b))
     embed = discord.Embed(title="Light Info", description=f"You have chosen {r}, {g}, {b}", color=discord.Colour.from_rgb(r, g, b))
     await ctx.send(embed=embed)
+
+@light.error
+async def light_error(ctx, error):
+    await ctx.message.add_reaction('🇳')
+    await ctx.message.add_reaction('🇴')
 
 bot.run(TOKEN)

@@ -2,7 +2,9 @@ import os
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
-from requests import post
+import json
+from requests import post, get
+import webcolors
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -24,7 +26,24 @@ def getData(r, g, b):
 def getData2(r, g, b):
     return f'{{"entity_id": "light.arbeitszimmer", "rgb_color": [{r}, {g}, {b}]}}'
 
- 
+def closest_colour(requested_colour):
+    min_colours = {}
+    for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
+        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+        rd = (r_c - requested_colour[0]) ** 2
+        gd = (g_c - requested_colour[1]) ** 2
+        bd = (b_c - requested_colour[2]) ** 2
+        min_colours[(rd + gd + bd)] = name
+    return min_colours[min(min_colours.keys())]
+
+def get_colour_name(requested_colour):
+    try:
+        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
+    except ValueError:
+        closest_name = closest_colour(requested_colour)
+        actual_name = None
+    return actual_name, closest_name
+
 @bot.event
 async def on_ready():
     activity = discord.Streaming(name="~help", url="https://www.youtube.com/watch?v=9Deg7VrpHbM")
@@ -35,9 +54,9 @@ async def on_ready():
 @bot.command(
     help="""
     Verfügbare Farben:
-    🔴\u2794 red
-    🟢\u2794 green
-    🔵\u2794 blue
+    🔴 \u2794 red
+    🟢 \u2794 green
+    🔵 \u2794 blue
     🟣 \u2794 purple
     ⚪ \u2794 white
     🟡 \u2794 yellow
@@ -78,6 +97,18 @@ async def light(ctx, *, arg):
         embed = discord.Embed(title="Dumm?", description="Du solltest dich besser über die Farben informieren...", color=discord.Colour.dark_red())
         await ctx.send(embed = embed)
         return
+
+@bot.command(help="guvken wie licht izzzz")
+async def status(ctx):
+    response = get(url = f"{BASE_URL}api/states/light.schreibtisch", headers=headers)
+    state = json.loads(response.text)
+    rgb = state["attributes"]["rgb_color"]
+    r = rgb[0]
+    g = rgb[1]
+    b = rgb[2]
+    actual, closest = get_colour_name((r, g, b))
+    embed = discord.Embed(title="Aktuelle Farbe", description=f"Die Farbe ist {closest}.\nSchau links lol.", color=discord.Colour.from_rgb(r, g, b))
+    await ctx.send(embed=embed)
 
 @bot.command(
     help="""

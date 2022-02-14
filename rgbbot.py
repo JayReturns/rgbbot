@@ -13,6 +13,7 @@ BASE_URL = os.getenv('BASE_URL')
 
 url = f"{BASE_URL}api/services/light/turn_on"
 url_off = f"{BASE_URL}api/services/light/turn_off"
+test_url = f"{BASE_URL}api/states/input_boolean.discord_rgb"
 headers = {
     "Authorization": f"Bearer {LONG_LIVED_TOKEN}",
     "content-type": "application/json",
@@ -44,6 +45,11 @@ def get_colour_name(requested_colour):
         actual_name = None
     return actual_name, closest_name
 
+def can_change():
+    response = get(test_url, headers=headers)
+    state = json.loads(response.text)["state"]
+    return state == "on"
+
 @bot.event
 async def on_ready():
     activity = discord.Streaming(name="~help", url="https://www.youtube.com/watch?v=9Deg7VrpHbM")
@@ -64,6 +70,10 @@ async def on_ready():
     """
 )
 async def light(ctx, *, arg):
+
+    if not can_change():
+        await ctx.message.add_reaction('☹')
+        return
 
     if arg == 'red':
         post(url, headers=headers, data=getData(255, 0, 0))
@@ -100,6 +110,11 @@ async def light(ctx, *, arg):
 
 @bot.command(help="guvken wie licht izzzz")
 async def status(ctx):
+
+    if not can_change():
+        await ctx.message.add_reaction('☹')
+        return
+
     response = get(url = f"{BASE_URL}api/states/light.schreibtisch", headers=headers)
     state = json.loads(response.text)
     rgb = state["attributes"]["rgb_color"]
@@ -116,7 +131,11 @@ async def status(ctx):
     """
 )
 async def light_fancy(ctx, r, g, b):
-    
+
+    if not can_change():
+        await ctx.message.add_reaction('☹')
+        return
+
     try:
         r = int(r)
         g = int(g)
@@ -137,6 +156,7 @@ async def light_fancy(ctx, r, g, b):
 
 @light.error
 async def light_error(ctx, error):
+    print(error)
     await ctx.message.add_reaction('🇳')
     await ctx.message.add_reaction('🇴')
 

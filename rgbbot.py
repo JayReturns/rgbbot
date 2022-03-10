@@ -48,7 +48,9 @@ def get_colour_name(requested_colour):
 def can_change():
     response = get(test_url, headers=headers)
     state = json.loads(response.text)["state"]
-    return state == "on"
+    # off = changeable
+    # on  = not changeable
+    return state == "off"
 
 @bot.event
 async def on_ready():

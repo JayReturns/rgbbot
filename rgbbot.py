@@ -79,31 +79,24 @@ async def light(ctx, *, arg):
 
     if arg == 'red':
         post(url, headers=headers, data=getData(255, 0, 0))
-        post(url, headers=headers, data=getData2(255, 0, 0))
         await ctx.message.add_reaction('🔴')
     elif arg == 'blue':
         post(url, headers=headers, data=getData(0, 0, 255))
-        post(url, headers=headers, data=getData2(0, 0, 255))
         await ctx.message.add_reaction('🔵')
     elif arg == 'yellow':
         post(url, headers=headers, data=getData(255, 255, 0))
-        post(url, headers=headers, data=getData2(255, 255, 0))
         await ctx.message.add_reaction('🟡')
     elif arg == 'green':
         post(url, headers=headers, data=getData(0, 255, 0))
-        post(url, headers=headers, data=getData2(0, 255, 0))
         await ctx.message.add_reaction('🟢')
     elif arg == 'purple':
         post(url, headers=headers, data=getData(127, 0, 255))
-        post(url, headers=headers, data=getData2(127, 0, 255))
         await ctx.message.add_reaction('🟣')
     elif arg == 'white':
         post(url, headers=headers, data=getData(255, 255, 255))
-        post(url, headers=headers, data=getData2(255, 255, 255))
         await ctx.message.add_reaction('⚪')
     elif arg == 'black':
         post(url_off, headers=headers, data='{"entity_id": "light.schreibtisch"}')
-        post(url_off, headers=headers, data='{"entity_id": "light.arbeitszimmer"}')
         await ctx.message.add_reaction('⚫')
     else:
         embed = discord.Embed(title="Dumm?", description="Du solltest dich besser über die Farben informieren...", color=discord.Colour.dark_red())

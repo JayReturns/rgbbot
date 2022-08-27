@@ -6,6 +6,8 @@ import json
 from requests import post, get
 import webcolors
 from datetime import datetime
+from googletrans import Translator
+
 
 load_dotenv()
 
@@ -24,6 +26,8 @@ headers = {
 }
 
 bot = commands.Bot(command_prefix='~')
+
+translator = Translator()
 
 
 def get_json_data(r, g, b):
@@ -104,7 +108,8 @@ async def light(ctx, *, arg):
 
     post(url, headers=headers, data=get_json_data(rgb.red, rgb.green, rgb.blue))
 
-    embed = discord.Embed(title="Farbe geändert", description=f"Du hast die Farbe auf {arg} geändert.",
+    translatedColor = translator.translate(arg, src='en', dest='de').text
+    embed = discord.Embed(title="Farbe geändert", description=f"Du hast die Farbe auf {translatedColor} geändert.",
                           color=discord.Colour.from_rgb(rgb.red, rgb.green, rgb.blue))
     await ctx.send(embed=embed)
 

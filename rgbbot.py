@@ -27,9 +27,6 @@ headers = {
 
 bot = commands.Bot(command_prefix='~')
 
-translator = Translator()
-
-
 def get_json_data(r, g, b):
     return f'{{"entity_id": "{LIGHT_ENTITY}", "rgb_color": [{r}, {g}, {b}]}}'
 
@@ -85,15 +82,15 @@ async def on_ready():
 async def light(ctx, *, arg):
     if not can_change():
         embed = discord.Embed(title="Warte noch ein bisschen",
-                              description=f"Leider ist das zur Zeit nicht verfügbar, da Jan-Luca nicht an seinem PC sitzt.",
-                              color=discord.Colour.orange())
+                            description=f"Leider ist das zur Zeit nicht verfügbar, da Jan-Luca nicht an seinem PC sitzt.",
+                            color=discord.Colour.orange())
         await ctx.send(embed=embed)
         return
 
     if arg == "black":
         post(url_off, headers=headers, data=f'{{"entity_id": "{LIGHT_ENTITY}"}}')
         embed = discord.Embed(title="Licht ausgeschaltet", description=f"Du hast das Licht ausgeschaltet.",
-                              color=discord.Colour.from_rgb(0, 0, 0))
+                            color=discord.Colour.from_rgb(0, 0, 0))
         await ctx.send(embed=embed)
         return
 
@@ -101,16 +98,16 @@ async def light(ctx, *, arg):
         rgb = webcolors.name_to_rgb(arg)
     except ValueError:
         embed = discord.Embed(title="Oh nein!", description="Diese Farbe kenne ich leider nicht :confused:",
-                              color=discord.Colour.dark_red(), url="https://www.w3schools.com/cssref/css_colors.asp")
+                            color=discord.Colour.dark_red(), url="https://www.w3schools.com/cssref/css_colors.asp")
         embed.set_footer(text="p.s. Klicke doch mal auf den Link und informiere dich :)")
         await ctx.send(embed=embed)
         return
 
     post(url, headers=headers, data=get_json_data(rgb.red, rgb.green, rgb.blue))
 
-    translatedColor = translator.translate(arg, src='en', dest='de').text
+    translatedColor = Translator().translate(arg, src='en', dest='de').text
     embed = discord.Embed(title="Farbe geändert", description=f"Du hast die Farbe auf {translatedColor} geändert.",
-                          color=discord.Colour.from_rgb(rgb.red, rgb.green, rgb.blue))
+                        color=discord.Colour.from_rgb(rgb.red, rgb.green, rgb.blue))
     await ctx.send(embed=embed)
 
 

@@ -1,5 +1,5 @@
-discord.py
+discord.py==1.7.0
 python-dotenv
 webcolors
 requests
-googletrans
+googletrans==4.0.0rc1
